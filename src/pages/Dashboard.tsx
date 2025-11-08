@@ -1,107 +1,174 @@
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Droplets, TrendingDown, AlertTriangle, Sparkles, Activity } from "lucide-react";
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { Droplets, TrendingDown, AlertTriangle, Sparkles, Activity, Award, Home, Bell } from "lucide-react";
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-const dailyUsage = [
-  { hour: "12am", usage: 2 },
-  { hour: "3am", usage: 1 },
-  { hour: "6am", usage: 45 },
-  { hour: "9am", usage: 38 },
-  { hour: "12pm", usage: 25 },
-  { hour: "3pm", usage: 18 },
-  { hour: "6pm", usage: 52 },
-  { hour: "9pm", usage: 35 },
+const hourlyData = [
+  { time: "12am", flow: 2 },
+  { time: "3am", flow: 1 },
+  { time: "6am", flow: 45 },
+  { time: "7am", flow: 38 },
+  { time: "8am", flow: 28 },
+  { time: "9am", flow: 15 },
+  { time: "10am", flow: 8 },
+  { time: "11am", flow: 12 },
+  { time: "12pm", flow: 25 },
+  { time: "1pm", flow: 18 },
+  { time: "2pm", flow: 10 },
+  { time: "3pm", flow: 14 },
+  { time: "4pm", flow: 22 },
+  { time: "5pm", flow: 19 },
+  { time: "6pm", flow: 52 },
+  { time: "7pm", flow: 48 },
+  { time: "8pm", flow: 35 },
+  { time: "9pm", flow: 28 },
+  { time: "10pm", flow: 15 },
+  { time: "11pm", flow: 8 },
 ];
 
 const weeklyUsage = [
-  { day: "Mon", usage: 285 },
-  { day: "Tue", usage: 320 },
-  { day: "Wed", usage: 275 },
-  { day: "Thu", usage: 310 },
-  { day: "Fri", usage: 295 },
-  { day: "Sat", usage: 340 },
-  { day: "Sun", usage: 315 },
+  { day: "Mon", usage: 285, target: 244 },
+  { day: "Tue", usage: 320, target: 244 },
+  { day: "Wed", usage: 275, target: 244 },
+  { day: "Thu", usage: 310, target: 244 },
+  { day: "Fri", usage: 295, target: 244 },
+  { day: "Sat", usage: 340, target: 244 },
+  { day: "Sun", usage: 315, target: 244 },
+];
+
+const roomData = [
+  { name: "Bathroom", value: 45, color: "hsl(var(--primary))" },
+  { name: "Kitchen", value: 25, color: "hsl(var(--chart-2))" },
+  { name: "Laundry", value: 20, color: "hsl(var(--chart-3))" },
+  { name: "Garden", value: 10, color: "hsl(var(--chart-4))" },
+];
+
+const deviceData = [
+  { device: "Shower", usage: 85, status: "normal", icon: "🚿" },
+  { device: "Kitchen Sink", usage: 42, status: "normal", icon: "🚰" },
+  { device: "Toilet", usage: 28, status: "warning", icon: "🚽" },
+  { device: "Washing Machine", usage: 56, status: "normal", icon: "🧺" },
 ];
 
 export default function Dashboard() {
+  const [currentUsage, setCurrentUsage] = useState(12.4);
+  const [notifications] = useState(3);
+
+  useEffect(() => {
+    // Update current usage every 2 minutes
+    const interval = setInterval(() => {
+      setCurrentUsage(prev => Math.max(0, prev + (Math.random() - 0.5) * 4));
+    }, 120000); // 2 minutes
+
+    // Also update on component mount (refresh)
+    setCurrentUsage(Math.random() * 15 + 5);
+
+    return () => clearInterval(interval);
+  }, []);
   return (
     <>
       <Navbar />
       <div className="min-h-screen bg-muted/30 pt-16">
         <div className="container mx-auto px-4 py-8">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">Water Usage Dashboard</h1>
-            <p className="text-muted-foreground">Real-time insights into your water consumption</p>
-          </div>
+          {/* Current Usage Hero */}
+          <Card className="mb-6 border-0 bg-gradient-to-br from-primary to-secondary text-primary-foreground">
+            <CardContent className="p-8">
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="flex items-center gap-2 mb-2 opacity-90">
+                    <Activity className="h-5 w-5" />
+                    <span className="text-sm font-medium">Current Flow Rate</span>
+                  </div>
+                  <div className="text-6xl font-bold mb-2">
+                    {currentUsage.toFixed(1)}
+                    <span className="text-3xl ml-2">L/min</span>
+                  </div>
+                  <div className="text-sm opacity-90">Kitchen Sink • Active</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm opacity-90 mb-1">Today's Total</div>
+                  <div className="text-3xl font-bold">287L</div>
+                  <div className="text-sm opacity-90 mt-2">43L over target</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             <Card>
               <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 bg-success/10 rounded-lg flex items-center justify-center">
+                    <TrendingDown className="h-5 w-5 text-success" />
+                  </div>
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Today's Usage
+                    Weekly Average
                   </CardTitle>
-                  <Droplets className="h-4 w-4 text-primary" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">216 L</div>
+                <div className="text-2xl font-bold">243 L/day</div>
                 <p className="text-sm text-success flex items-center gap-1 mt-1">
-                  <TrendingDown className="h-4 w-4" />
-                  12% less than yesterday
+                  ↓ 12% from last week
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <Droplets className="h-5 w-5 text-primary" />
+                  </div>
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Monthly Average
+                    Monthly Total
                   </CardTitle>
-                  <Activity className="h-4 w-4 text-secondary" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">302 L/day</div>
+                <div className="text-2xl font-bold">7,290 L</div>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Current month trend
+                  8 days remaining
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 bg-warning/10 rounded-lg flex items-center justify-center">
+                    <AlertTriangle className="h-5 w-5 text-warning" />
+                  </div>
                   <CardTitle className="text-sm font-medium text-muted-foreground">
                     Active Alerts
                   </CardTitle>
-                  <AlertTriangle className="h-4 w-4 text-warning" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">1</div>
+                <div className="text-2xl font-bold">1 Warning</div>
                 <p className="text-sm text-warning mt-1">
-                  Bathroom sink - slow leak detected
+                  Toilet leak detected
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 bg-accent/10 rounded-lg flex items-center justify-center">
+                    <Award className="h-5 w-5 text-accent" />
+                  </div>
                   <CardTitle className="text-sm font-medium text-muted-foreground">
                     Water Saved
                   </CardTitle>
-                  <TrendingDown className="h-4 w-4 text-success" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">1,247 L</div>
+                <div className="text-2xl font-bold">940 L</div>
                 <p className="text-sm text-muted-foreground mt-1">
                   This month
                 </p>
@@ -109,140 +176,190 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          {/* Charts */}
-          <div className="grid lg:grid-cols-2 gap-6 mb-8">
+          {/* Charts Row */}
+          <div className="grid lg:grid-cols-2 gap-6 mb-6">
             <Card>
               <CardHeader>
-                <CardTitle>Today's Hourly Usage</CardTitle>
-                <CardDescription>Water consumption throughout the day</CardDescription>
+                <CardTitle>Weekly Usage Trend</CardTitle>
+                <CardDescription>Daily consumption vs target</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={dailyUsage}>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={weeklyUsage}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="hour" className="text-xs" />
+                    <XAxis dataKey="day" className="text-xs" />
                     <YAxis className="text-xs" />
-                    <Tooltip />
-                    <Area 
-                      type="monotone" 
-                      dataKey="usage" 
-                      stroke="hsl(var(--primary))" 
-                      fill="hsl(var(--primary))" 
-                      fillOpacity={0.2}
-                    />
-                  </AreaChart>
+                    <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid hsl(var(--border))' }} />
+                    <Legend />
+                    <Bar dataKey="usage" fill="hsl(var(--primary))" name="Usage (L)" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="target" fill="hsl(var(--muted))" name="Target (L)" radius={[8, 8, 0, 0]} />
+                  </BarChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>Weekly Overview</CardTitle>
-                <CardDescription>Daily water usage for the past week</CardDescription>
+                <CardTitle>Usage by Room</CardTitle>
+                <CardDescription>Distribution across your home</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={weeklyUsage}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="day" className="text-xs" />
-                    <YAxis className="text-xs" />
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={roomData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={90}
+                      fill="hsl(var(--primary))"
+                      dataKey="value"
+                    >
+                      {roomData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
                     <Tooltip />
-                    <Bar dataKey="usage" fill="hsl(var(--secondary))" radius={[8, 8, 0, 0]} />
-                  </BarChart>
+                  </PieChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
           </div>
 
-          {/* AI Insights */}
-          <Card className="mb-8">
+          {/* Hourly Flow Pattern */}
+          <Card className="mb-6">
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-accent" />
-                <CardTitle>AI-Powered Insights & Recommendations</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-4 p-4 rounded-lg bg-success/10 border border-success/20">
-                <Badge variant="outline" className="bg-success text-success-foreground border-success">
-                  High Impact
-                </Badge>
-                <div className="flex-1">
-                  <h4 className="font-semibold mb-1">Shorten morning showers by 2 minutes</h4>
-                  <p className="text-sm text-muted-foreground">
-                    You could save approximately 30 liters per day (900L/month). Your average shower time is 
-                    currently 12 minutes, which is above the recommended 8-10 minutes.
-                  </p>
-                  <Button variant="link" className="h-auto p-0 mt-2">
-                    Set shower timer reminder
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 p-4 rounded-lg bg-warning/10 border border-warning/20">
-                <Badge variant="outline" className="bg-warning text-warning-foreground border-warning">
-                  Action Required
-                </Badge>
-                <div className="flex-1">
-                  <h4 className="font-semibold mb-1">Bathroom sink leak detected</h4>
-                  <p className="text-sm text-muted-foreground">
-                    We've detected a continuous flow of 0.5 L/hour from your bathroom sink for the past 8 hours. 
-                    This could waste 360L per month if not addressed.
-                  </p>
-                  <Button variant="link" className="h-auto p-0 mt-2">
-                    Schedule repair
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 p-4 rounded-lg bg-primary/10 border border-primary/20">
-                <Badge variant="outline" className="bg-primary text-primary-foreground border-primary">
-                  Tip
-                </Badge>
-                <div className="flex-1">
-                  <h4 className="font-semibold mb-1">Peak usage during evening hours</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Your highest water consumption occurs between 6-9 PM. Consider running dishwasher and 
-                    laundry during off-peak hours to reduce strain on local water systems.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Device Status */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Connected Sensors</CardTitle>
-              <CardDescription>Status of your AquaSense monitoring devices</CardDescription>
+              <CardTitle>Today's Hourly Flow Pattern</CardTitle>
+              <CardDescription>Water flow rate throughout the day</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {[
-                  { name: "Kitchen Sink", status: "online", flow: "2.3 L/min" },
-                  { name: "Bathroom Shower", status: "online", flow: "0 L/min" },
-                  { name: "Bathroom Sink", status: "warning", flow: "0.5 L/min" },
-                  { name: "Guest Bathroom", status: "online", flow: "0 L/min" },
-                  { name: "Garden Hose", status: "online", flow: "0 L/min" },
-                ].map((device, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 rounded-lg border">
-                    <div className="flex items-center gap-3">
-                      <div className={`h-2 w-2 rounded-full ${
-                        device.status === "online" ? "bg-success" : "bg-warning"
-                      }`} />
-                      <span className="font-medium">{device.name}</span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm text-muted-foreground">{device.flow}</span>
-                      <Badge variant="outline">
-                        {device.status === "online" ? "Active" : "Alert"}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <ResponsiveContainer width="100%" height={200}>
+                <LineChart data={hourlyData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis dataKey="time" className="text-xs" />
+                  <YAxis className="text-xs" label={{ value: 'L/min', angle: -90, position: 'insideLeft' }} />
+                  <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid hsl(var(--border))' }} />
+                  <Line 
+                    type="monotone" 
+                    dataKey="flow" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth={3}
+                    dot={{ fill: 'hsl(var(--primary))', r: 4 }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
+
+          {/* Bottom Row */}
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Device Status */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Home className="h-5 w-5" />
+                  Device Status
+                </CardTitle>
+                <CardDescription>Connected sensor readings</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {deviceData.map((device, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{device.icon}</span>
+                        <div>
+                          <div className="font-medium">{device.device}</div>
+                          <div className="text-sm text-muted-foreground">{device.usage}L today</div>
+                        </div>
+                      </div>
+                      <div className={`h-2 w-2 rounded-full ${device.status === 'warning' ? 'bg-warning' : 'bg-success'}`} />
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Recent Alerts */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="h-5 w-5" />
+                  Recent Alerts
+                </CardTitle>
+                <CardDescription>Notifications and updates</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="p-3 bg-warning/10 rounded-lg border border-warning/20">
+                    <div className="flex items-start gap-2 mb-1">
+                      <AlertTriangle className="h-4 w-4 text-warning mt-0.5" />
+                      <div className="flex-1">
+                        <div className="text-sm font-medium">Possible leak in bathroom toilet</div>
+                        <div className="text-xs text-muted-foreground mt-1">2 hours ago</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-3 bg-success/10 rounded-lg border border-success/20">
+                    <div className="flex items-start gap-2 mb-1">
+                      <TrendingDown className="h-4 w-4 text-success mt-0.5" />
+                      <div className="flex-1">
+                        <div className="text-sm font-medium">You saved 45L today vs last week!</div>
+                        <div className="text-xs text-muted-foreground mt-1">5 hours ago</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-3 bg-accent/10 rounded-lg border border-accent/20">
+                    <div className="flex items-start gap-2 mb-1">
+                      <Award className="h-4 w-4 text-accent mt-0.5" />
+                      <div className="flex-1">
+                        <div className="text-sm font-medium">7-day conservation streak!</div>
+                        <div className="text-xs text-muted-foreground mt-1">1 day ago</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* AI Insights */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-accent" />
+                  <CardTitle>AI Insights</CardTitle>
+                </div>
+                <CardDescription>Personalized recommendations</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="p-3 bg-success/10 rounded-lg border border-success/20">
+                  <Badge variant="outline" className="bg-success/20 text-success border-success mb-2">
+                    High Impact
+                  </Badge>
+                  <p className="text-sm font-medium mb-1">Shorten showers by 2 minutes</p>
+                  <p className="text-xs text-muted-foreground">Save ~30L/day (900L/month)</p>
+                </div>
+
+                <div className="p-3 bg-warning/10 rounded-lg border border-warning/20">
+                  <Badge variant="outline" className="bg-warning/20 text-warning border-warning mb-2">
+                    Action Needed
+                  </Badge>
+                  <p className="text-sm font-medium mb-1">Fix running toilet</p>
+                  <p className="text-xs text-muted-foreground">Prevent 200L/day waste</p>
+                </div>
+
+                <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
+                  <Badge variant="outline" className="bg-primary/20 text-primary border-primary mb-2">
+                    Tip
+                  </Badge>
+                  <p className="text-sm font-medium mb-1">Run dishwasher off-peak</p>
+                  <p className="text-xs text-muted-foreground">Reduce system strain</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </>

@@ -41,10 +41,11 @@ export const Hero = () => {
             >
               Try Demo Dashboard
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
+            <Button
+              size="lg"
+              variant="outline"
               className="text-lg px-8"
+              onClick={() => window.open("https://github.com/Divin2009/wave-aware-home", "_blank")}
             >
               Learn More
             </Button>

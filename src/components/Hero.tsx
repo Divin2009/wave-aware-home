@@ -23,9 +23,7 @@ export const Hero = () => {
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
             Track Every Drop,
             <br />
-            <span className="gradient-water bg-clip-text text-transparent">
-              Save Every Gallon
-            </span>
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">Save Every Gallon</span>
           </h1>
 
           {/* Description */}
